@@ -2,6 +2,7 @@
 
 namespace ZeroDaHero\LaravelWorkflow\MarkingStores;
 
+use Symfony\Component\Translation\Exception\LogicException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 
@@ -39,6 +40,8 @@ class EloquentMarkingStore implements MarkingStoreInterface
 
         if ($this->singleState) {
             $marking = [(string) $marking => 1];
+        } else if (!\is_array($marking)) {
+            throw new LogicException(sprintf('The marking stored in "%s::$%s" is not an array and the Workflow\'s Marking store is instantiated with $singleState=false.', get_debug_type($subject), $this->property));
         }
 
         return new Marking($marking);
