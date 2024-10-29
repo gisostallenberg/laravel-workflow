@@ -71,7 +71,7 @@ class WorkflowDumpCommand extends Command
                 ' Please specify a valid support class with the --class option.');
         }
 
-        $dumper_options = [
+        $dumperOptions = [
             'with-metadata' => $withMetadata,
         ];
 
@@ -89,7 +89,7 @@ class WorkflowDumpCommand extends Command
 
         $process = new Process($dotCommand);
         $process->setWorkingDirectory($path);
-        $process->setInput($dumper->dump($definition, options: $dumper_options));
+        $process->setInput($dumper->dump($definition, options: $dumperOptions));
         $process->mustRun();
     }
 }
