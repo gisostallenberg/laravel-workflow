@@ -10,7 +10,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.4|^8.0|^8.1|^8.2",
+        "php": "^8.1|^8.2|^8.3",
         "symfony/workflow": "^6.0|^7.0",
         "symfony/process": "^6.0|^7.0",
         "symfony/event-dispatcher-contracts": "^2.4|^3.0",
