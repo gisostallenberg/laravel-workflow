@@ -3,8 +3,8 @@
 namespace Tests;
 
 use Mockery;
-use Illuminate\Support\Facades\Storage;
 use Mockery\MockInterface;
+use Illuminate\Support\Facades\Storage;
 use ZeroDaHero\LaravelWorkflow\Commands\WorkflowDumpCommand;
 
 class WorkflowDumpCommandTest extends BaseWorkflowTestCase
@@ -34,7 +34,7 @@ class WorkflowDumpCommandTest extends BaseWorkflowTestCase
     public function testWorkflowCommand()
     {
         $optionalPath = '/my/path';
-        $disk         = 'public';
+        $disk = 'public';
 
         Storage::fake($disk);
 
@@ -88,6 +88,35 @@ class WorkflowDumpCommandTest extends BaseWorkflowTestCase
         $this->assertStringNotContainsString('metadata_exists', $svg_file);
     }
 
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']['workflow'] = [
+            'straight' => [
+                'supports' => ['Tests\Fixtures\TestObject'],
+                'places' => [
+                    'a',
+                    'b',
+                    'c',
+                    'metadata_place' => [
+                        'metadata' => [
+                            'metadata_exists' => true,
+                        ],
+                    ],
+                ],
+                'transitions' => [
+                    't1' => [
+                        'from' => 'a',
+                        'to' => 'b',
+                    ],
+                    't2' => [
+                        'from' => 'b',
+                        'to' => 'c',
+                    ],
+                ],
+            ],
+        ];
+    }
+
     private function getMock(
         string $workflow = 'straight',
         string $format = 'png',
@@ -117,34 +146,5 @@ class WorkflowDumpCommandTest extends BaseWorkflowTestCase
             ->with('with-metadata')
             ->andReturn($withMetadata)
             ->getMock();
-    }
-
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']['workflow'] = [
-            'straight' => [
-                'supports' => ['Tests\Fixtures\TestObject'],
-                'places'   => [
-                    'a',
-                    'b',
-                    'c',
-                    'metadata_place' => [
-                        'metadata' => [
-                            'metadata_exists' => true,
-                        ],
-                    ],
-                ],
-                'transitions' => [
-                    't1' => [
-                        'from' => 'a',
-                        'to'   => 'b',
-                    ],
-                    't2' => [
-                        'from' => 'b',
-                        'to'   => 'c',
-                    ],
-                ],
-            ],
-        ];
     }
 }
