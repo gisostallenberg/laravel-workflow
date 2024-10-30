@@ -21,7 +21,7 @@ composer require zerodahero/laravel-workflow
 
 ## Upgrade from v5 to v6
 
-Version 6 drops support for PHP 8.1 and Laravel 9.
+Version 6 drops support for PHP 8.0 and Laravel 9.
 
 ## Upgrade from v4 to v5
 
