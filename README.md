@@ -1,12 +1,4 @@
-# Laravel workflow [![Build Status](https://travis-ci.com/zerodahero/laravel-workflow.svg?branch=develop)](https://travis-ci.org/zerodahero/laravel-workflow)
-
-## :warning: Looking for help maintaining!
-
-It's been several years since I've actually used this package in a project. It's relatively low maintenance since it's mostly just an adapter for the Symfony component. It's been harder and harder to find time to spend on this project, so I'm looking for help in maintaining it, or if there's a good fit, to take over the package entirely.
-
----
-
-This is a fork from [brexis/laravel-workflow](https://github.com/brexis/laravel-workflow). My current needs for this package are a bit more bleeding-edge than seem to be maintainable by the other packages. Massive kudos to brexis for the original work and adaptation on this.
+# Laravel workflow
 
 Use the Symfony Workflow component in Laravel
 
@@ -25,10 +17,19 @@ composer require zerodahero/laravel-workflow
 | ^3.2 | 8.x |
 | ^4.0 | 9.x, 10.x |
 | ^5.0 | 11.x |
+| ^6.0 | 11.x |
+
+## Upgrade from v5 to v6
+
+Version 6 drops support for PHP 8.1 and Laravel 9.
+
+## Upgrade from v4 to v5
+
+The primary change is to the PHP and Laravel version, which only PHP 8.0, 8.1, 8.2 and Laravel 9, 10, and 11 are supported in this version.
 
 ## Upgrade from v3 to v4
 
-The changes is to the PHP and Laravel version, which only PHP 8.0, 8.1 and Laravel 9 are supported in this version. If you required to use the older version, do take from version 3.4.
+The primary change is to the PHP and Laravel version, which only PHP 8.0, 8.1 and Laravel 9 are supported in this version. If you required to use the older version, use version 3.4.
 
 ## Upgrade from v2 to v3
 
