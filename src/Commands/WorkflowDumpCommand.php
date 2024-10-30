@@ -27,7 +27,8 @@ class WorkflowDumpCommand extends Command
         {--class= : the support class name}
         {--format=png : the image format}
         {--disk=local : the storage disk name}
-        {--path= : the optional path within selected disk}';
+        {--path= : the optional path within selected disk}
+        {--with-metadata : dumps metadata beneath the label }';
 
     /**
      * The console command description.
@@ -50,6 +51,7 @@ class WorkflowDumpCommand extends Command
         $config = Config::get('workflow');
         $disk = $this->option('disk');
         $optionalPath = $this->option('path');
+        $withMetadata = $this->option('with-metadata');
 
         if ($disk === 'local') {
             $optionalPath ??= '.';
@@ -69,6 +71,10 @@ class WorkflowDumpCommand extends Command
                 ' Please specify a valid support class with the --class option.');
         }
 
+        $dumperOptions = [
+            'with-metadata' => $withMetadata,
+        ];
+
         $subject = new $class();
         $workflow = Workflow::get($subject, $workflowName);
         $definition = $workflow->getDefinition();
@@ -83,7 +89,7 @@ class WorkflowDumpCommand extends Command
 
         $process = new Process($dotCommand);
         $process->setWorkingDirectory($path);
-        $process->setInput($dumper->dump($definition));
+        $process->setInput($dumper->dump($definition, options: $dumperOptions));
         $process->mustRun();
     }
 }

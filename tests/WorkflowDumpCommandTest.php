@@ -4,68 +4,37 @@ namespace Tests;
 
 use Mockery;
 use Illuminate\Support\Facades\Storage;
+use Mockery\MockInterface;
 use ZeroDaHero\LaravelWorkflow\Commands\WorkflowDumpCommand;
 
 class WorkflowDumpCommandTest extends BaseWorkflowTestCase
 {
     public function testShouldThrowExceptionForUndefinedWorkflow()
     {
-        $command = Mockery::mock(WorkflowDumpCommand::class)
-            ->makePartial()
-            ->shouldReceive('argument')
-            ->with('workflow')
-            ->andReturn('fake')
-            ->shouldReceive('option')
-            ->with('format')
-            ->andReturn('png')
-            ->shouldReceive('option')
-            ->with('class')
-            ->andReturn('Tests\Fixtures\TestObject')
-            ->shouldReceive('option')
-            ->with('disk')
-            ->andReturn('local')
-            ->shouldReceive('option')
-            ->with('path')
-            ->andReturn('/')
-            ->getMock();
+        $command = $this->getMock(workflow: 'fake');
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Workflow fake is not configured.');
+
         $command->handle();
     }
 
     public function testShouldThrowExceptionForUndefinedClass()
     {
-        $command = Mockery::mock(WorkflowDumpCommand::class)
-            ->makePartial()
-            ->shouldReceive('argument')
-            ->with('workflow')
-            ->andReturn('straight')
-            ->shouldReceive('option')
-            ->with('format')
-            ->andReturn('png')
-            ->shouldReceive('option')
-            ->with('class')
-            ->andReturn('Tests\Fixtures\FakeObject')
-            ->shouldReceive('option')
-            ->with('disk')
-            ->andReturn('local')
-            ->shouldReceive('option')
-            ->with('path')
-            ->andReturn('/')
-            ->getMock();
+        $command = $this->getMock(class: 'Tests\Fixtures\FakeObject');
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Workflow straight has no support for' .
             ' class Tests\Fixtures\FakeObject. Please specify a valid support' .
             ' class with the --class option.');
+
         $command->handle();
     }
 
     public function testWorkflowCommand()
     {
         $optionalPath = '/my/path';
-        $disk = 'public';
+        $disk         = 'public';
 
         Storage::fake($disk);
 
@@ -73,28 +42,81 @@ class WorkflowDumpCommandTest extends BaseWorkflowTestCase
             Storage::disk($disk)->delete($optionalPath . '/straight.png');
         }
 
-        $command = Mockery::mock(WorkflowDumpCommand::class)
+        $command = $this->getMock(disk: $disk, path: $optionalPath);
+        $command->handle();
+
+        Storage::disk($disk)->assertExists($optionalPath . '/straight.png');
+    }
+
+    public function testWorkflowCommandWithMetadata()
+    {
+        $disk = 'public';
+
+        Storage::fake($disk);
+
+        $command = $this->getMock(
+            disk: $disk,
+            format: 'svg',
+            withMetadata: true,
+        );
+
+        $command->handle();
+
+        Storage::disk($disk)->assertExists('straight.svg');
+        $svg_file = Storage::disk($disk)->get('straight.svg');
+        $this->assertStringContainsString('metadata_place', $svg_file);
+        $this->assertStringContainsString('metadata_exists', $svg_file);
+    }
+
+    public function testWorkflowCommandWithoutMetadata()
+    {
+        $disk = 'public';
+
+        Storage::fake($disk);
+
+        $command = $this->getMock(
+            disk: $disk,
+            format: 'svg',
+            withMetadata: false,
+        );
+
+        $command->handle();
+
+        Storage::disk($disk)->assertExists('straight.svg');
+        $svg_file = Storage::disk($disk)->get('straight.svg');
+        $this->assertStringContainsString('metadata_place', $svg_file);
+        $this->assertStringNotContainsString('metadata_exists', $svg_file);
+    }
+
+    private function getMock(
+        string $workflow = 'straight',
+        string $format = 'png',
+        string $class = 'Tests\Fixtures\TestObject',
+        string $disk = 'local',
+        string $path = '/',
+        bool $withMetadata = false,
+    ): MockInterface {
+        return Mockery::mock(WorkflowDumpCommand::class)
             ->makePartial()
             ->shouldReceive('argument')
             ->with('workflow')
-            ->andReturn('straight')
+            ->andReturn($workflow)
             ->shouldReceive('option')
             ->with('format')
-            ->andReturn('png')
+            ->andReturn($format)
             ->shouldReceive('option')
             ->with('class')
-            ->andReturn('Tests\Fixtures\TestObject')
+            ->andReturn($class)
             ->shouldReceive('option')
             ->with('disk')
             ->andReturn($disk)
             ->shouldReceive('option')
             ->with('path')
-            ->andReturn($optionalPath)
+            ->andReturn($path)
+            ->shouldReceive('option')
+            ->with('with-metadata')
+            ->andReturn($withMetadata)
             ->getMock();
-
-        $command->handle();
-
-        Storage::disk($disk)->assertExists($optionalPath . '/straight.png');
     }
 
     protected function getEnvironmentSetUp($app)
@@ -102,15 +124,24 @@ class WorkflowDumpCommandTest extends BaseWorkflowTestCase
         $app['config']['workflow'] = [
             'straight' => [
                 'supports' => ['Tests\Fixtures\TestObject'],
-                'places' => ['a', 'b', 'c'],
+                'places'   => [
+                    'a',
+                    'b',
+                    'c',
+                    'metadata_place' => [
+                        'metadata' => [
+                            'metadata_exists' => true,
+                        ],
+                    ],
+                ],
                 'transitions' => [
                     't1' => [
                         'from' => 'a',
-                        'to' => 'b',
+                        'to'   => 'b',
                     ],
                     't2' => [
                         'from' => 'b',
-                        'to' => 'c',
+                        'to'   => 'c',
                     ],
                 ],
             ],

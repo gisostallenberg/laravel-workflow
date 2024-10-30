@@ -573,6 +573,10 @@ You can change the image format with the `--format` option. By default the forma
 
     php artisan workflow:dump workflow_name --format=jpg
 
+Similar to [Symfony](https://symfony.com/doc/current/workflow/dumping-workflows.html#styling). You can use `--with-metadata` to include workflow's metadata
+
+    php artisan workflow:dump workflow_name --with-metadata
+
 If you would like to output to a different directory than root, you can use the `--disk` and `--path` options to set the Storage disk (`local` by default) and path (`root_path()` by default).
 
     php artisan workflow:dump workflow-name --class=App\\BlogPost --disk=s3 --path="workflows/diagrams/"
